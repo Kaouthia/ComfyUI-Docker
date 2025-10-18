@@ -3,7 +3,7 @@
 # https://github.com/kaouthia
 
 # Use a minimal Python base image (adjust version as needed)
-FROM python:3.12-slim-bookworm
+FROM python:3.13-slim-trixie
 
 # Allow passing in your host UID/GID (defaults 1000:1000)
 ARG UID=1000
