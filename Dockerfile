@@ -45,6 +45,9 @@ RUN git clone https://github.com/comfyanonymous/ComfyUI.git
 # Change directory to the ComfyUI folder
 WORKDIR /app/ComfyUI
 
+#custom cuda12.6 for NVIDIA 10 series cards
+RUN pip install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cu126
+
 # Install ComfyUI dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
