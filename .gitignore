@@ -1,0 +1,6 @@
+settings/comfy.settings.json
+settings/ComfyUI-Manager/config.ini
+workflows/235.69.json
+workflows/flux_schnell.json
+workflows/flux_dev_checkpoint_example.json
+workflows/flux_dev_GGUF.json
