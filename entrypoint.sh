@@ -8,13 +8,14 @@ set -e
 
 # --- Force ComfyUI-Manager config (uv off, no file logging, safe DB) ---
 # Make sure user dirs exist and are writable (handles Windows bind mounts)
-mkdir -p /app/ComfyUI/user /app/ComfyUI/user/default
+mkdir -p /app/ComfyUI/user /app/ComfyUI/user/default /app/ComfyUI/user/__manager
 chown -R "$(id -u)":"$(id -g)" /app/ComfyUI/user || true
 chmod -R u+rwX /app/ComfyUI/user || true
 
-CFG_DIR="/app/ComfyUI/user/default/ComfyUI-Manager"
+CFG_DIR="/app/ComfyUI/user/__manager"
 CFG_FILE="$CFG_DIR/config.ini"
-DB_DIR="$CFG_DIR"
+
+DB_DIR="/app/ComfyUI/user/default"
 DB_PATH="${DB_DIR}/manager.db"
 SQLITE_URL="sqlite:////${DB_PATH}"
 
@@ -28,29 +29,11 @@ use_uv = False
 file_logging = False
 db_mode = cache
 database_url = ${SQLITE_URL}
+security_level = weak
+network_mode = public
+always_lazy_install = False
+bypass_ssl = True
 EOF
-else
-  echo "↳ Updating ComfyUI-Manager config.ini (uv OFF, no file logging, DB cache)"
-  # use_uv = False
-  grep -q '^use_uv' "$CFG_FILE" \
-    && sed -i 's/^use_uv.*/use_uv = False/' "$CFG_FILE" \
-    || printf '\nuse_uv = False\n' >> "$CFG_FILE"
-
-  # file_logging = False (and drop any existing log_path line)
-  grep -q '^file_logging' "$CFG_FILE" \
-    && sed -i 's/^file_logging.*/file_logging = False/' "$CFG_FILE" \
-    || printf '\nfile_logging = False\n' >> "$CFG_FILE"
-  sed -i '/^log_path[[:space:]=]/d' "$CFG_FILE" || true
-
-  # db_mode = cache (prevents file DB usage)
-  grep -q '^db_mode' "$CFG_FILE" \
-    && sed -i 's/^db_mode.*/db_mode = cache/' "$CFG_FILE" \
-    || printf '\ndb_mode = cache\n' >> "$CFG_FILE"
-
-  # Provide a safe DB URL anyway (future-proof if Manager flips off cache)
-  grep -q '^database_url' "$CFG_FILE" \
-    && sed -i "s|^database_url.*|database_url = ${SQLITE_URL}|" "$CFG_FILE" \
-    || printf "database_url = ${SQLITE_URL}\n" >> "$CFG_FILE"
 fi
 
 
